@@ -25,8 +25,6 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-    translation.Init()
-    telemetry.Init()
 	client, err := disgo.New(os.Getenv("DISCORD_TOKEN"),
 		bot.WithGatewayConfigOpts(
 			gateway.WithIntents(
@@ -39,6 +37,7 @@ func main() {
 		panic(err)
 	}
 
+    translation.Init()
 	commandhandler.Init(client)
 	client.AddEventListeners(&events.ListenerAdapter{
 		OnReady:                         listeners.ReadyListener,
