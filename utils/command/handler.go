@@ -1,14 +1,13 @@
 package command
 
 import (
-	"bot/utils/telemetry"
-
-	"github.com/disgoorg/disgo/bot"
-	"github.com/disgoorg/disgo/discord"
-	"github.com/disgoorg/disgo/events"
+    "github.com/disgoorg/disgo/bot"
+    "github.com/disgoorg/disgo/discord"
+    "github.com/disgoorg/disgo/events"
+    "ocean/utils/telemetry"
 )
 
-var Commands = []Command{}
+var Commands []Command
 
 var InteractionEvent = make(chan *events.ApplicationCommandInteractionCreate)
 var Workers = 128
@@ -22,7 +21,7 @@ type Command struct {
 	DefaultMemberPermissions discord.Permissions
 	AllowDM                  bool
 
-	Runner func(ctx *CommandContext)
+	Runner func(ctx *Context) error
 }
 
 func init() {
@@ -41,21 +40,25 @@ func Worker(id int) {
 }
 
 func Init(client bot.Client) {
-	SendCommandsToDiscord(client)
 	RemoveUnregisteredCommands(client)
+	SendCommandsToDiscord(client)
 }
 
 func HandleCommand(e *events.ApplicationCommandInteractionCreate) {
 	slash := e.SlashCommandInteractionData()
 	command := GetCommand(slash.CommandName())
-	
+
 	if command == nil {
 		return
 	}
 
-	command.Runner(&CommandContext{
-		Event: e,
-	})
+    err := command.Runner(&Context{
+        Event:   e,
+    })
+
+    if err != nil {
+
+    }
 }
 
 func RegisterCommand(command Command) {
@@ -72,7 +75,7 @@ func GetCommand(name string) *Command {
 }
 
 func SendCommandsToDiscord(client bot.Client) {
-	commands := []discord.ApplicationCommandCreate{}
+    var commands []discord.ApplicationCommandCreate
 	for _, command := range Commands {
 		cmd := discord.SlashCommandCreate{
 			Name:        command.Name,
@@ -86,6 +89,8 @@ func SendCommandsToDiscord(client bot.Client) {
 	if _, err := client.Rest().SetGlobalCommands(client.ApplicationID(), commands); err != nil {
 		telemetry.Errorf("Error setting commands: %s", err.Error())
 	}
+
+	telemetry.Infof("Slash commands registered and updated with %d commands", len(commands))
 }
 
 func RemoveUnregisteredCommands(client bot.Client) {
@@ -97,8 +102,11 @@ func RemoveUnregisteredCommands(client bot.Client) {
 	for _, command := range commands {
 		if GetCommand(command.Name()) == nil {
 			telemetry.Debugf("Removing command %s", command.Name())
-			client.Rest().DeleteGlobalCommand(client.ApplicationID(), command.ID())
+            err := client.Rest().DeleteGlobalCommand(client.ApplicationID(), command.ID())
+            if err != nil {
+                telemetry.Errorf("An error occurred while deleting command %s", command.Name())
+            }
 		}
 	}
-
+	telemetry.Info("The old slash commands have been removed")
 }

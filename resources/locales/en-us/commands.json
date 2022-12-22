@@ -1,0 +1,9 @@
+{
+    "test": "Test",
+    "ping": {
+        "test": "Ping Test",
+        "slash": {
+            "name": "Ping Slash Name"
+        }
+    }
+}

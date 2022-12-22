@@ -1,13 +1,14 @@
 package main
 
 import (
-	_ "bot/commands"
-	"bot/listeners"
-	commandhandler "bot/utils/command"
-	"bot/utils/telemetry"
 	"context"
-	"log"
-	"os"
+    "log"
+    _ "ocean/commands"
+	"ocean/listeners"
+	commandhandler "ocean/utils/command"
+	"ocean/utils/telemetry"
+    "ocean/utils/translation"
+    "os"
 	"os/signal"
 	"syscall"
 
@@ -21,31 +22,32 @@ import (
 func main() {
 	telemetry.Info("Starting bot...")
 	if err := godotenv.Load(); err != nil {
-    log.Fatal("Error loading .env file")
-  }
+		log.Fatal("Error loading .env file")
+	}
 
+    translation.Init()
+    telemetry.Init()
 	client, err := disgo.New(os.Getenv("DISCORD_TOKEN"),
 		bot.WithGatewayConfigOpts(
 			gateway.WithIntents(
 				gateway.IntentsNone,
 			),
 		),
+//        bot.WithLogger(),
 	)
+	if err != nil {
+		panic(err)
+	}
+
+	commandhandler.Init(client)
 	client.AddEventListeners(&events.ListenerAdapter{
-		OnReady: listeners.ReadyListener,
+		OnReady:                         listeners.ReadyListener,
 		OnApplicationCommandInteraction: listeners.InteractionListener,
 	})
 
-	go commandhandler.Init(client)
-	
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	if err := client.OpenGateway(context.TODO()); err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
-
 
 	s := make(chan os.Signal, 1)
 	signal.Notify(s, syscall.SIGINT, syscall.SIGTERM)

@@ -1,9 +1,11 @@
 package commands
 
 import (
-	handler "bot/utils/command"
+    "fmt"
+    handler "ocean/utils/command"
+    "ocean/utils/translation"
 
-	"github.com/disgoorg/disgo/discord"
+    "github.com/disgoorg/disgo/discord"
 )
 
 func init() {
@@ -14,8 +16,11 @@ func init() {
 	})
 }
 
-func pinghandle(ctx *handler.CommandContext) {
-	ctx.Event.CreateMessage(
+func pinghandle(ctx *handler.Context) (err error) {
+    t := translation.GetFixedT("en-us")
+    fmt.Println(t("test"))
+
+	return ctx.Event.CreateMessage(
 		discord.NewMessageCreateBuilder().SetContent("Pong!").
 		Build(),
 	)
