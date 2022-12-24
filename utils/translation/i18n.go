@@ -10,6 +10,7 @@ import (
 )
 
 var Languages = []string{"en-us"}
+var DefaultLanguage = Languages[0]
 var Ns = []string{"commands"}
 var translations = make(map[string]map[string]map[string]any)
 
@@ -39,38 +40,42 @@ func Init() {
 }
 
 func GetFixedT(language string) func(path string, data ...interface{}) string {
-	return func(path string, data ...interface{}) string {
+	return func(query string, data ...interface{}) string {
 		// `langobj` irá retornar um objeto com todos os ns
 		if langobj, ok := translations[language]; ok {
-			nspath := strings.SplitN(path, ":", 2)
+			nspath := strings.SplitN(query, ":", 2)
 			ns := nspath[0]
-			path = nspath[1]
+			path := nspath[1]
 
 			// translation um objeto com todas as traduções
 			if translation, ok := langobj[ns]; ok {
 				splitedPath := strings.Split(path, ".")
 				var selector any = translation
 
-                // iremos navegar por todas as keys
-                // se colocarmos [a, b, c], irá navegar até chegar ao c
+				// iremos navegar por todas as keys
+				// se colocarmos [a, b, c], irá navegar até chegar ao c, caso não consiga chegar ao c, irá retornar a path
 				for _, name := range splitedPath {
 					if _selector, ok := selector.(map[string]interface{})[name]; ok {
 						selector = _selector.(interface{})
 					} else {
-						return path
+						telemetry.Debugf("Could not reach %s, key %s does not exist", query, name)
+						return query
 					}
 				}
 
 				if reflect.TypeOf(selector).Kind() != reflect.String {
-					return path
+					telemetry.Debugf("%s is not a string", query)
+					return query
 				}
 
 				return selector.(string)
 			} else {
-				return path
+                telemetry.Debugf("NS %s does not exists", ns)
+				return query
 			}
 		} else {
-			return path
+            telemetry.Debugf("Language %s does not exists", language)
+			return query
 		}
 	}
 }
