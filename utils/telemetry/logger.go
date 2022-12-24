@@ -1,15 +1,16 @@
 package telemetry
 
 import (
-    "fmt"
-    "os"
-    "strconv"
-    "time"
+	"fmt"
+	"os"
+	"strconv"
+	"time"
 )
+
 func log(message string, level string) {
 	tm := time.Now().UTC().Format("2006-01-02 15:04:05")
 
-	fmt.Printf("\x1b[37m[%s] \x1b[0m%s\x1b[0m: %s\n", tm, level,message)
+	fmt.Printf("\x1b[37m[%s] \x1b[0m%s\x1b[0m: %s\n", tm, level, message)
 }
 
 func Info(message string) {
@@ -34,18 +35,18 @@ func Errorf(message string, args ...interface{}) {
 }
 
 func Fatal(message string) {
-    log(message, "\x1b[31;1mERROR")
-    os.Exit(1)
+	log(message, "\x1b[31;1mERROR")
+	os.Exit(1)
 }
 func Fatalf(message string, args ...interface{}) {
-    go Fatal(fmt.Sprintf(message, args...))
+	go Fatal(fmt.Sprintf(message, args...))
 }
 
 func Debug(message string) {
-    isDebugMode, _ := strconv.ParseBool(os.Getenv("DEBUG"))
-    if isDebugMode {
-	   go log(message, "\x1b[35;1mDEBUG")
-    }
+	isDebugMode, _ := strconv.ParseBool(os.Getenv("DEBUG"))
+	if isDebugMode {
+		go log(message, "\x1b[35;1mDEBUG")
+	}
 }
 func Debugf(message string, args ...interface{}) {
 	go Debug(fmt.Sprintf(message, args...))

@@ -1,4 +1,4 @@
-module ocean
+module github.com/richaardev/Ocean
 
 go 1.19
 

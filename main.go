@@ -1,14 +1,15 @@
 package main
 
 import (
+	_ "github.com/richaardev/Ocean/commands"
+	"github.com/richaardev/Ocean/listeners"
+	"github.com/richaardev/Ocean/utils/command"
+	"github.com/richaardev/Ocean/utils/telemetry"
+	_ "github.com/richaardev/Ocean/utils/translation"
+
 	"context"
-    "log"
-    _ "ocean/commands"
-	"ocean/listeners"
-	commandhandler "ocean/utils/command"
-	"ocean/utils/telemetry"
-    "ocean/utils/translation"
-    "os"
+	"log"
+	"os"
 	"os/signal"
 	"syscall"
 
@@ -31,14 +32,12 @@ func main() {
 				gateway.IntentsNone,
 			),
 		),
-//        bot.WithLogger(),
 	)
 	if err != nil {
 		panic(err)
 	}
 
-    translation.Init()
-	commandhandler.Init(client)
+	command.Init(client)
 	client.AddEventListeners(&events.ListenerAdapter{
 		OnReady:                         listeners.ReadyListener,
 		OnApplicationCommandInteraction: listeners.InteractionListener,

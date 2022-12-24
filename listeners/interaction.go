@@ -1,7 +1,7 @@
 package listeners
 
 import (
-    "ocean/utils/command"
+	"github.com/richaardev/Ocean/utils/command"
 
 	"github.com/disgoorg/disgo/events"
 )

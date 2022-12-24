@@ -1,7 +1,7 @@
 package listeners
 
 import (
-    "ocean/utils/telemetry"
+	"github.com/richaardev/Ocean/utils/telemetry"
 
 	"github.com/disgoorg/disgo/events"
 )

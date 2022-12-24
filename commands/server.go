@@ -1,18 +1,22 @@
 package commands
 
 import (
+	"github.com/richaardev/Ocean/utils/command"
+	"github.com/richaardev/Ocean/utils/translation"
+
 	"github.com/disgoorg/disgo/discord"
-	"ocean/utils/command"
 )
 
 func init() {
 	command.RegisterCommand(command.Command{
 		Name:        "server",
-		Description: "_",
+		Description: "show info",
 		Options: []discord.ApplicationCommandOption{
 			discord.ApplicationCommandOptionSubCommand{
-				Name:        "info",
-				Description: "Get info about the bot",
+				Name:                     "info",
+				Description:              translation.Translate("commands:server.info.slash.description"),
+				NameLocalizations:        translation.GetLocalizationsValues("commands:server.info.slash.name"),
+				DescriptionLocalizations: translation.GetLocalizationsValues("commands:server.info.slash.description"),
 			},
 		},
 

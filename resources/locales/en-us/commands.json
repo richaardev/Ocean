@@ -1,9 +1,18 @@
 {
-    "test": "Test",
-    "ping": {
-        "test": "Ping Test",
-        "slash": {
-            "name": "Ping Slash Name"
-        }
+  "ping": {
+    "response": "Pong, `%dms`",
+
+    "description": "Get information about my response time"
+  },
+  "server": {
+    "info": {
+      "slash": {
+        "name": "info",
+        "description": "Get info about the server u"
+      }
     }
+  },
+  "ocean": {
+    "description": "Howdly!!! I'm currently on %d servers with %d commands.\nI was created in <t:%d> by **`%s`** together with **`%s`**, programmed in **[GoLang ](https://go.dev/)** using **[disgo](https://github.com/disgoorg/disgo)** and currently I stay hosted for free on **[SquareCloud](https: //squarecloud.app/)**"
+  }
 }

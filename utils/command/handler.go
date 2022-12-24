@@ -1,10 +1,11 @@
 package command
 
 import (
-    "github.com/disgoorg/disgo/bot"
-    "github.com/disgoorg/disgo/discord"
-    "github.com/disgoorg/disgo/events"
-    "ocean/utils/telemetry"
+  "github.com/disgoorg/disgo/bot"
+  "github.com/disgoorg/disgo/discord"
+  "github.com/disgoorg/disgo/events"
+  "github.com/richaardev/Ocean/utils/telemetry"
+  "github.com/richaardev/Ocean/utils/translation"
 )
 
 var Commands []Command
@@ -14,9 +15,11 @@ var Workers = 128
 var WorkersArray = make([]bool, Workers)
 
 type Command struct {
-	Name        string
-	Description string
-	Options     []discord.ApplicationCommandOption
+	Name                     string
+	Description              string
+	NameLocalizations        map[discord.Locale]string
+	DescriptionLocalizations map[discord.Locale]string
+	Options                  []discord.ApplicationCommandOption
 
 	DefaultMemberPermissions discord.Permissions
 	AllowDM                  bool
@@ -52,13 +55,14 @@ func HandleCommand(e *events.ApplicationCommandInteractionCreate) {
 		return
 	}
 
-    err := command.Runner(&Context{
-        Event:   e,
-    })
+	err := command.Runner(&Context{
+		Event: e,
+    T: translation.GetFixedT(translation.DefaultLanguage),
+	})
 
-    if err != nil {
+	if err != nil {
 
-    }
+	}
 }
 
 func RegisterCommand(command Command) {
@@ -75,12 +79,14 @@ func GetCommand(name string) *Command {
 }
 
 func SendCommandsToDiscord(client bot.Client) {
-    var commands []discord.ApplicationCommandCreate
+	var commands []discord.ApplicationCommandCreate
 	for _, command := range Commands {
 		cmd := discord.SlashCommandCreate{
-			Name:        command.Name,
-			Description: command.Description,
-			Options:     command.Options,
+			Name:                     command.Name,
+			Description:              command.Description,
+			NameLocalizations:        command.NameLocalizations,
+			DescriptionLocalizations: command.DescriptionLocalizations,
+			Options:                  command.Options,
 		}
 
 		commands = append(commands, cmd)
@@ -102,10 +108,10 @@ func RemoveUnregisteredCommands(client bot.Client) {
 	for _, command := range commands {
 		if GetCommand(command.Name()) == nil {
 			telemetry.Debugf("Removing command %s", command.Name())
-            err := client.Rest().DeleteGlobalCommand(client.ApplicationID(), command.ID())
-            if err != nil {
-                telemetry.Errorf("An error occurred while deleting command %s", command.Name())
-            }
+			err := client.Rest().DeleteGlobalCommand(client.ApplicationID(), command.ID())
+			if err != nil {
+				telemetry.Errorf("An error occurred while deleting command %s", command.Name())
+			}
 		}
 	}
 	telemetry.Info("The old slash commands have been removed")

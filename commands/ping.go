@@ -1,27 +1,22 @@
 package commands
 
 import (
-    "fmt"
-    handler "ocean/utils/command"
-    "ocean/utils/translation"
-
-    "github.com/disgoorg/disgo/discord"
+  "github.com/disgoorg/disgo/discord"
+  handler "github.com/richaardev/Ocean/utils/command"
 )
 
 func init() {
 	handler.RegisterCommand(handler.Command{
-		Name: "ping",
+		Name:        "ping",
 		Description: "Pings the bot",
-		Runner: pinghandle,
+    
+		Runner:      pinghandle,
 	})
 }
 
 func pinghandle(ctx *handler.Context) (err error) {
-    t := translation.GetFixedT("en-us")
-    fmt.Println(t("test"))
-
 	return ctx.Event.CreateMessage(
-		discord.NewMessageCreateBuilder().SetContent("Pong!").
-		Build(),
+		discord.NewMessageCreateBuilder().SetContentf(ctx.T("commands:ping.response"), ctx.Client().Gateway().Latency().Milliseconds()).
+			Build(),
 	)
 }

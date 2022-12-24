@@ -3,18 +3,19 @@ package translation
 import (
 	"encoding/json"
 	"fmt"
-	"ocean/utils/telemetry"
+	"github.com/disgoorg/disgo/discord"
+	"github.com/richaardev/Ocean/utils/telemetry"
 	"os"
 	"reflect"
 	"strings"
 )
 
-var Languages = []string{"en-us"}
+var Languages = []string{"en-us"} // soon portuguese
 var DefaultLanguage = Languages[0]
 var Ns = []string{"commands"}
 var translations = make(map[string]map[string]map[string]any)
 
-func Init() {
+func init() {
 	for _, lang := range Languages {
 		for _, ns := range Ns {
 			var resu = map[string]any{}
@@ -39,7 +40,13 @@ func Init() {
 	telemetry.Info("Locales file have been registered")
 }
 
-func GetFixedT(language string) func(path string, data ...interface{}) string {
+func Translate(query string, data ...interface{}) string {
+	return GetFixedT(DefaultLanguage)(query, data)
+}
+
+type TFunction func(path string, data ...interface{}) string
+
+func GetFixedT(language string) TFunction {
 	return func(query string, data ...interface{}) string {
 		// `langobj` irá retornar um objeto com todos os ns
 		if langobj, ok := translations[language]; ok {
@@ -56,7 +63,7 @@ func GetFixedT(language string) func(path string, data ...interface{}) string {
 				// se colocarmos [a, b, c], irá navegar até chegar ao c, caso não consiga chegar ao c, irá retornar a path
 				for _, name := range splitedPath {
 					if _selector, ok := selector.(map[string]interface{})[name]; ok {
-						selector = _selector.(interface{})
+						selector = _selector
 					} else {
 						telemetry.Debugf("Could not reach %s, key %s does not exist", query, name)
 						return query
@@ -70,12 +77,28 @@ func GetFixedT(language string) func(path string, data ...interface{}) string {
 
 				return selector.(string)
 			} else {
-                telemetry.Debugf("NS %s does not exists", ns)
+				telemetry.Debugf("NS %s does not exists", ns)
 				return query
 			}
 		} else {
-            telemetry.Debugf("Language %s does not exists", language)
+			telemetry.Debugf("Language %s does not exists", language)
 			return query
 		}
 	}
+}
+
+func GetLocalizationsValues(path string) map[discord.Locale]string {
+	result := map[discord.Locale]string{}
+
+	for _, language := range Languages {
+		dlang := language
+		if strings.Contains(language, "-") {
+			s := strings.Split(language, "-")
+			language = s[0] + "-" + strings.ToUpper(s[1])
+		}
+
+		result[discord.Locale(language)] = GetFixedT(dlang)(path)
+	}
+
+	return result
 }
