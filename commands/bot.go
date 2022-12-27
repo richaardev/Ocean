@@ -38,7 +38,7 @@ func infohandle(ctx *command.Context) error {
 				discord.NewEmbedBuilder().
 					SetColor(0x3194c6).
 					SetThumbnail(self.EffectiveAvatarURL()).
-					SetDescriptionf("Olá atualmente eu estou em %d servidores com %d comandos.\nFui criada em <t:%d> por **`%s`** junto com a **`%s`**, programada em **[GoLang](https://go.dev/)** usando **[disgo](https://github.com/disgoorg/disgo)** e atualmente eu me mantenho hospedada gratuitamente na **[SquareCloud](https://squarecloud.app/)**",
+					SetDescriptionf(ctx.T("commands:ocean.description"),
 						len(ctx.Client().Caches().Guilds().All()), len(command.Commands), self.CreatedAt().Unix(),
 						owner.Username+"#"+owner.Discriminator, helper.Username+"#"+helper.Discriminator,
 					).

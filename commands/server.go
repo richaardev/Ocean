@@ -10,7 +10,7 @@ import (
 func init() {
 	command.RegisterCommand(command.Command{
 		Name:        "server",
-		Description: "show info",
+		Description: "_",
 		Options: []discord.ApplicationCommandOption{
 			discord.ApplicationCommandOptionSubCommand{
 				Name:                     "info",
