@@ -1,0 +1,33 @@
+name: "Upload project to Square Cloud"
+
+on: push
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+          
+      - name: Archive Release
+        uses: thedoctor0/zip-release@0.7.1
+        with:
+          type: 'zip'
+          filename: 'release.zip'
+          exclusions: '*.git*'
+
+      - name: Deploy to Square
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://api.squarecloud.app/v1/public/commit/${{ secrets.SQUARE_APPLICATIONID }}'
+          method: 'POST'
+          files: '{ "file": "${{ github.workspace }}/release.zip" }'
+          customHeaders: '{"Authorization": "${{ secrets.SQUARE_TOKEN }}"}'
+
+      - name: Restart Application
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://api.squarecloud.app/v1/public/restart/${{ secrets.SQUARE_APPLICATIONID }}'
+          method: 'POST'
+          customHeaders: '{"Authorization": "${{ secrets.SQUARE_TOKEN }}"}'
