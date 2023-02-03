@@ -14,4 +14,4 @@ jobs:
         with:
           restart: true
           token: ${{ secrets.SQUARE_TOKEN }}
-          application_id: ${{ secrets.APPLICATIONID }}
+          application_id: ${{ secrets.SQUARE_APPLICATIONID }}
