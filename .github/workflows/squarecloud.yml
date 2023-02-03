@@ -12,6 +12,6 @@ jobs:
       - name: Commit to Square Cloud
         uses: richaardev/squarecloud-action@v1.0.0
         with:
-          restart: true
-          token: ${{ secrets.SQUARE_TOKEN }}
-          application_id: ${{ secrets.SQUARE_APPLICATIONID }}
+          restart: 'true'
+          token: '${{ secrets.SQUARE_TOKEN }}'
+          application_id: '${{ secrets.SQUARE_APPLICATIONID }}'
