@@ -12,6 +12,6 @@ jobs:
       - name: Commit to Square Cloud
         uses: squarecloudofc/github-action@v1.1.0
         with:
-          restart: 'true'
+          restart: true
           token: '${{ secrets.SQUARE_TOKEN }}'
           application_id: '${{ secrets.SQUARE_APPLICATIONID }}'
